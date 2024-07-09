@@ -1,8 +1,6 @@
 from telnetlib import EC
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-
 from .base_page import BasePage
 
 

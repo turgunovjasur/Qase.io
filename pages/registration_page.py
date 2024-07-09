@@ -1,3 +1,5 @@
+from telnetlib import EC
+
 from selenium.webdriver.common.by import By
 from .base_page import BasePage
 
@@ -15,3 +17,12 @@ class RegistrationPage(BasePage):
 
     def click_sign_up_button(self):
         self.click_element(self.SIGN_UP_BUTTON)
+
+    def is_error_message_displayed(self, error_text):
+        try:
+            error_element = self.wait.until(
+                EC.visibility_of_element_located(self.ERROR_MESSAGE)
+            )
+            return error_text in error_element.text
+        except:
+            return False
