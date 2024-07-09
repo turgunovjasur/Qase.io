@@ -1,7 +1,13 @@
+import random
+
 import pytest
-from pages.main_page import MainPage
-from pages.registration_page import RegistrationPage
-from pages.congratulations_page import CongratulationsPage
+from pages.login_page import LoginPage
+from pages.dashboart_page import DashboartPage
+from pages.sales_modal import SalesModal
+from pages.orders_page import OrdersPage
+from pages.goods_page import GoodsPage
+from pages.final_page import FinalPage
+from pages.create_order_page import CreateOrderPage
 from utils.driver_setup import setup_driver
 
 
@@ -13,40 +19,46 @@ def driver():
     driver.quit()
 
 
-def test_registration(driver):
-    email = "ksdsxbfgcjxj24653@gmail.com"
+def test_all(driver):
+    login = "ksdsxbfgcjxj24653@gmail.com"
     password = '01443354Hsdshsdghgdgf@'
-    password_confirmation = '01443354Hsdshsdghgdgf@'
 
-    main_page = MainPage(driver)
-    main_page.check_main_page()
-    main_page.click_start_free_button()
+    login_page = LoginPage(driver)
+    login_page.fill_registration_form(login, password)
+    login_page.click_sign_up_button()
 
-    reg_page = RegistrationPage(driver)
-    reg_page.fill_registration_form(email, password, password_confirmation)
-    reg_page.click_sign_up_button()
+    dashboard_page = DashboartPage(driver)
+    dashboard_page.check_page()
+    dashboard_page.click_button()
 
-    congrats_page = CongratulationsPage(driver)
-    try:
-        congrats_page.check_congratulations_page()
-    except:
-        congrats_page.take_screenshot("congratulations_error")
-        raise  # Xatoni qayta ko'tarish
+    sales_modal = SalesModal(driver)
+    sales_modal.check_modal()
+    sales_modal.click_button()
 
-    congrats_page.check_email_on_page(email)
+    orders_page = OrdersPage(driver)
+    orders_page.check_page()
+    count_orders = orders_page.check_count()
+    orders_page.click_create_button()
+
+    create_orders_page = CreateOrderPage(driver)
+    create_orders_page.check_page()
+    create_orders_page.fill_form(order_date, workspace, staff_unit, client, project, contract)
+    create_orders_page.click_next_button()
+
+    goods_page = GoodsPage(driver)
+    goods_page.fill_form(name, qty, name_2, qty_2)
+    goods_page.click_next_button()
+
+    final_page = FinalPage(driver)
+    final_page.fill_form(payment_type, status)
+    final_page.click_save_button()
+
+    check_orders_page = OrdersPage(driver)
+    check_orders_page.check_page()
+    new_count_orders = check_orders_page.check_count()
+    assert count_orders+1 == new_count_orders, "FAIL"
 
 
-def test_too_long_input(driver):
-    email = "a" * 256 + "@example.com"  # 256 ta 'a' harfi + "@example.com"
-    password = 'a' * 129  # 129 ta 'a' harfi
-    password_confirmation = 'a' * 129
 
-    main_page = MainPage(driver)
-    main_page.check_main_page()
-    main_page.click_start_free_button()
 
-    reg_page = RegistrationPage(driver)
-    reg_page.fill_registration_form(email, password, password_confirmation)
-    reg_page.click_sign_up_button()
 
-    assert reg_page.is_error_message_displayed("Email or password is too long")
